@@ -18,7 +18,6 @@ export const getCategoryById = async (req: Request, res: Response, next: NextFun
 
 export const createCategory = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    console.log('Request body:', req.body)
     const category = await Category.create({ id: uuid(), ...req.body })
     res.status(201).json(category)
   } catch (e) { next(e) }
