@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import * as controller from '../controllers/cart.controller.js'
+import { authenticate } from '../middlewares/auth.middleware.js'
 
 const router = Router()
 
@@ -7,8 +8,10 @@ const router = Router()
  * @swagger
  * /api/cart/{userId}:
  *   get:
- *     summary: Get cart by user ID
+ *     summary: Get cart by user ID (authenticated)
  *     tags: [Cart]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: userId
@@ -25,15 +28,19 @@ const router = Router()
  *               $ref: '#/components/schemas/Cart'
  *       404:
  *         description: Cart not found
+ *       401:
+ *         description: Not authenticated
  */
-router.get('/:userId', controller.getCartByUserId)
+router.get('/:userId', authenticate, controller.getCartByUserId)
 
 /**
  * @swagger
  * /api/cart/{userId}/items:
  *   post:
- *     summary: Add item to cart
+ *     summary: Add item to cart (authenticated)
  *     tags: [Cart]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: userId
@@ -62,15 +69,19 @@ router.get('/:userId', controller.getCartByUserId)
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Cart'
+ *       401:
+ *         description: Not authenticated
  */
-router.post('/:userId/items', controller.addItemToCart)
+router.post('/:userId/items', authenticate, controller.addItemToCart)
 
 /**
  * @swagger
  * /api/cart/{userId}/items/{id}:
  *   put:
- *     summary: Update cart item quantity
+ *     summary: Update cart item quantity (authenticated)
  *     tags: [Cart]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: userId
@@ -104,15 +115,19 @@ router.post('/:userId/items', controller.addItemToCart)
  *               $ref: '#/components/schemas/Cart'
  *       404:
  *         description: Cart or item not found
+ *       401:
+ *         description: Not authenticated
  */
-router.put('/:userId/items/:id', controller.updateCartItem)
+router.put('/:userId/items/:id', authenticate, controller.updateCartItem)
 
 /**
  * @swagger
  * /api/cart/{userId}/items/{id}:
  *   delete:
- *     summary: Remove item from cart
+ *     summary: Remove item from cart (authenticated)
  *     tags: [Cart]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: userId
@@ -135,15 +150,19 @@ router.put('/:userId/items/:id', controller.updateCartItem)
  *               $ref: '#/components/schemas/Cart'
  *       404:
  *         description: Cart or item not found
+ *       401:
+ *         description: Not authenticated
  */
-router.delete('/:userId/items/:id', controller.deleteCartItem)
+router.delete('/:userId/items/:id', authenticate, controller.deleteCartItem)
 
 /**
  * @swagger
  * /api/cart/{userId}:
  *   delete:
- *     summary: Delete entire cart
+ *     summary: Delete entire cart (authenticated)
  *     tags: [Cart]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: userId
@@ -156,7 +175,9 @@ router.delete('/:userId/items/:id', controller.deleteCartItem)
  *         description: Cart deleted
  *       404:
  *         description: Cart not found
+ *       401:
+ *         description: Not authenticated
  */
-router.delete('/:userId', controller.deleteCart)
+router.delete('/:userId', authenticate, controller.deleteCart)
 
 export default router

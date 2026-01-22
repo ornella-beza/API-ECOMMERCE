@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import * as controller from '../controllers/user.controller.js'
+import { authenticate, authorize } from '../middlewares/auth.middleware.js'
 
 const router = Router()
 
@@ -7,26 +8,53 @@ const router = Router()
  * @swagger
  * /api/users:
  *   get:
- *     summary: Get all users
+ *     summary: Get all users (Admin only)
  *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *       - in: query
+ *         name: sort
+ *         schema:
+ *           type: string
+ *           default: createdAt
  *     responses:
  *       200:
- *         description: List of users
+ *         description: List of users with pagination
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/User'
+ *               type: object
+ *               properties:
+ *                 users:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/User'
+ *                 pagination:
+ *                   type: object
+ *       403:
+ *         description: Insufficient permissions
  */
-router.get('/', controller.getUsers)
+router.get('/', authenticate, authorize('admin'), controller.getUsers)
 
 /**
  * @swagger
  * /api/users/{id}:
  *   get:
- *     summary: Get user by ID
+ *     summary: Get user by ID (Admin only)
  *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -43,15 +71,19 @@ router.get('/', controller.getUsers)
  *               $ref: '#/components/schemas/User'
  *       404:
  *         description: User not found
+ *       403:
+ *         description: Insufficient permissions
  */
-router.get('/:id', controller.getUserById)
+router.get('/:id', authenticate, authorize('admin'), controller.getUserById)
 
 /**
  * @swagger
  * /api/users:
  *   post:
- *     summary: Create a new user
+ *     summary: Create a new user (Admin only)
  *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -72,6 +104,7 @@ router.get('/:id', controller.getUserById)
  *                 type: string
  *               role:
  *                 type: string
+ *                 enum: [admin, vendor, customer]
  *     responses:
  *       201:
  *         description: User created
@@ -79,15 +112,19 @@ router.get('/:id', controller.getUserById)
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/User'
+ *       403:
+ *         description: Insufficient permissions
  */
-router.post('/', controller.createUser)
+router.post('/', authenticate, authorize('admin'), controller.createUser)
 
 /**
  * @swagger
  * /api/users/{id}:
  *   put:
- *     summary: Update user
+ *     summary: Update user (Admin only)
  *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -110,6 +147,7 @@ router.post('/', controller.createUser)
  *                 type: string
  *               role:
  *                 type: string
+ *                 enum: [admin, vendor, customer]
  *     responses:
  *       200:
  *         description: User updated
@@ -119,15 +157,19 @@ router.post('/', controller.createUser)
  *               $ref: '#/components/schemas/User'
  *       404:
  *         description: User not found
+ *       403:
+ *         description: Insufficient permissions
  */
-router.put('/:id', controller.updateUser)
+router.put('/:id', authenticate, authorize('admin'), controller.updateUser)
 
 /**
  * @swagger
  * /api/users/{id}:
  *   delete:
- *     summary: Delete user
+ *     summary: Delete user (Admin only)
  *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -140,7 +182,9 @@ router.put('/:id', controller.updateUser)
  *         description: User deleted
  *       404:
  *         description: User not found
+ *       403:
+ *         description: Insufficient permissions
  */
-router.delete('/:id', controller.deleteUser)
+router.delete('/:id', authenticate, authorize('admin'), controller.deleteUser)
 
 export default router

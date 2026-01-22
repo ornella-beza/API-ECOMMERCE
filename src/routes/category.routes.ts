@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import * as controller from '../controllers/category.controller.js'
+import { authenticate, authorize } from '../middlewares/auth.middleware.js'
 
 const router = Router()
 
@@ -7,7 +8,7 @@ const router = Router()
  * @swagger
  * /api/categories:
  *   get:
- *     summary: Get all categories
+ *     summary: Get all categories (public)
  *     tags: [Categories]
  *     responses:
  *       200:
@@ -25,7 +26,7 @@ router.get('/', controller.getCategories)
  * @swagger
  * /api/categories/{id}:
  *   get:
- *     summary: Get category by ID
+ *     summary: Get category by ID (public)
  *     tags: [Categories]
  *     parameters:
  *       - in: path
@@ -54,8 +55,10 @@ router.get('/:id', controller.getCategoryById)
  * @swagger
  * /api/categories:
  *   post:
- *     summary: Create a new category
+ *     summary: Create a new category (Admin only)
  *     tags: [Categories]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -76,15 +79,19 @@ router.get('/:id', controller.getCategoryById)
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Category'
+ *       403:
+ *         description: Insufficient permissions
  */
-router.post('/', controller.createCategory)
+router.post('/', authenticate, authorize('admin'), controller.createCategory)
 
 /**
  * @swagger
  * /api/categories/{id}:
  *   put:
- *     summary: Update category
+ *     summary: Update category (Admin only)
  *     tags: [Categories]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -110,17 +117,21 @@ router.post('/', controller.createCategory)
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Category'
+ *       403:
+ *         description: Insufficient permissions
  *       404:
  *         description: Category not found
  */
-router.put('/:id', controller.updateCategory)
+router.put('/:id', authenticate, authorize('admin'), controller.updateCategory)
 
 /**
  * @swagger
  * /api/categories/{id}:
  *   delete:
- *     summary: Delete category
+ *     summary: Delete category (Admin only)
  *     tags: [Categories]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -131,9 +142,11 @@ router.put('/:id', controller.updateCategory)
  *     responses:
  *       204:
  *         description: Category deleted
+ *       403:
+ *         description: Insufficient permissions
  *       404:
  *         description: Category not found
  */
-router.delete('/:id', controller.deleteCategory)
+router.delete('/:id', authenticate, authorize('admin'), controller.deleteCategory)
 
 export default router

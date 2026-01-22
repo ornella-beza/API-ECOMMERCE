@@ -8,7 +8,7 @@ const options = {
     info: {
       title: 'E-Commerce API',
       version: '1.0.0',
-      description: 'A simple e-commerce API with categories, users, and cart management',
+      description: 'A complete e-commerce API with authentication, RBAC, and advanced features',
     },
     servers: [
       {
@@ -17,94 +17,80 @@ const options = {
       },
     ],
     components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+        },
+      },
       schemas: {
+        User: {
+          type: 'object',
+          properties: {
+            id: { type: 'string' },
+            name: { type: 'string' },
+            email: { type: 'string' },
+            role: { type: 'string', enum: ['admin', 'vendor', 'customer'] },
+            profileImage: { type: 'string' },
+            createdAt: { type: 'string', format: 'date-time' },
+            updatedAt: { type: 'string', format: 'date-time' },
+          },
+        },
         Category: {
           type: 'object',
           required: ['name'],
           properties: {
-            id: {
-              type: 'string',
-              description: 'UUID of the category',
-            },
-            name: {
-              type: 'string',
-              description: 'Name of the category',
-            },
-            description: {
-              type: 'string',
-              description: 'Description of the category',
-            },
+            id: { type: 'string' },
+            name: { type: 'string' },
+            description: { type: 'string' },
           },
         },
-        User: {
+        Product: {
           type: 'object',
-          required: ['name', 'email', 'password', 'role'],
+          required: ['name', 'price', 'categoryId'],
           properties: {
-            id: {
-              type: 'string',
-              description: 'UUID of the user',
-            },
-            name: {
-              type: 'string',
-              description: 'Name of the user',
-            },
-            email: {
-              type: 'string',
-              description: 'Email of the user',
-            },
-            password: {
-              type: 'string',
-              description: 'Password of the user',
-            },
-            role: {
-              type: 'string',
-              description: 'Role of the user',
-            },
+            id: { type: 'string' },
+            name: { type: 'string' },
+            description: { type: 'string' },
+            price: { type: 'number' },
+            stock: { type: 'number' },
+            categoryId: { type: 'string' },
+            vendorId: { type: 'string' },
+            images: { type: 'array', items: { type: 'string' } },
           },
         },
         CartItem: {
           type: 'object',
           properties: {
-            id: {
-              type: 'string',
-              description: 'UUID of the cart item',
-            },
-            productId: {
-              type: 'string',
-              description: 'ID of the product',
-            },
-            quantity: {
-              type: 'number',
-              description: 'Quantity of the product',
-            },
+            id: { type: 'string' },
+            productId: { type: 'string' },
+            quantity: { type: 'number' },
           },
         },
         Cart: {
           type: 'object',
           properties: {
-            id: {
-              type: 'string',
-              description: 'UUID of the cart',
-            },
-            userId: {
-              type: 'string',
-              description: 'ID of the user who owns the cart',
-            },
-            items: {
-              type: 'array',
-              items: {
-                $ref: '#/components/schemas/CartItem',
-              },
-            },
+            id: { type: 'string' },
+            userId: { type: 'string' },
+            items: { type: 'array', items: { $ref: '#/components/schemas/CartItem' } },
+          },
+        },
+        Order: {
+          type: 'object',
+          properties: {
+            id: { type: 'string' },
+            userId: { type: 'string' },
+            items: { type: 'array' },
+            totalAmount: { type: 'number' },
+            status: { type: 'string', enum: ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled'] },
+            createdAt: { type: 'string', format: 'date-time' },
           },
         },
         Error: {
           type: 'object',
           properties: {
-            message: {
-              type: 'string',
-              description: 'Error message',
-            },
+            message: { type: 'string' },
           },
         },
       },
